@@ -1,6 +1,8 @@
 package replicatorg.app.ui.modeling;
 
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -105,6 +107,8 @@ public abstract class Tool implements MouseMotionListener, MouseListener, MouseW
 		}
 		startPoint = p;
 	}
+
+
 	public void mouseMoved(MouseEvent e) {
 	}
 	public void mouseClicked(MouseEvent e) {

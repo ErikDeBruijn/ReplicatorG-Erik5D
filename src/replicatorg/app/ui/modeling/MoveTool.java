@@ -3,6 +3,8 @@ package replicatorg.app.ui.modeling;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 import javax.media.j3d.Transform3D;
@@ -16,7 +18,7 @@ import net.miginfocom.swing.MigLayout;
 import replicatorg.app.Base;
 import replicatorg.app.ui.modeling.PreviewPanel.DragMode;
 
-public class MoveTool extends Tool {
+public class MoveTool extends Tool implements KeyListener {
 	public MoveTool(ToolPanel parent) {
 		super(parent);
 	}
@@ -95,11 +97,44 @@ public class MoveTool extends Tool {
 		super.mousePressed(e);
 	}
 	
+	/** Handle the key-pressed event */
+    public void keyPressed(KeyEvent e) {
+    	if(e.isShiftDown())
+    		lockZ.setSelected(true);
+    }
+	public void keyReleased(KeyEvent e) {
+    	//displayInfo(e, "KEY PRESSED: ");
+    	int modifiersEx = e.getModifiersEx();
+    	String tmpString = KeyEvent.getModifiersExText(modifiersEx);
+    	Base.logger.info("releasing: "+tmpString+" key="+e.getModifiersEx());
+//		if(KeyEvent.getModifiersExText(modifiersEx)=="shift")
+//		{
+//			Base.logger.info("Pressing: "+KeyEvent.getModifiersExText(modifiersEx)+" key="+e.getModifiersEx());
+    	switch(e.getKeyChar())
+    	{
+    		case('c'):
+    			Base.logger.info("Center...");
+			break;
+    		
+    		default:
+    	
+        	if(!e.isShiftDown())
+        		lockZ.setSelected(false);
+    	}
+//		}
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// TODO on pressing c, center the object
+	}
+
 	void doTranslate(double deltaX, double deltaY) {
 		Vector3d v = new Vector3d(deltaX,deltaY,0d);
 		vt.transform(v);
 		if (lockZ.isSelected()) { v.z = 0d; }
 		parent.getModel().translateObject(v.x,v.y,v.z);
 	}
+
+
 
 }
