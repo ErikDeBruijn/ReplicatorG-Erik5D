@@ -12,6 +12,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 
 import net.miginfocom.swing.MigLayout;
@@ -34,6 +35,9 @@ public class MoveTool extends Tool implements KeyListener {
 	}
 
 	JCheckBox lockZ;
+	boolean zWasLocked = false;
+	boolean manualLockZ = false;
+	double dragStartBottom;
 	
 	public JPanel getControls() {
 		JPanel p = new JPanel(new MigLayout("fillx,filly"));
@@ -54,6 +58,20 @@ public class MoveTool extends Tool implements KeyListener {
 		p.add(lowerButton,"growx,wrap");
 
 		lockZ = new JCheckBox("Lock height");
+		lockZ.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				//Base.logger.info("modifiers: "+e.getModifiers());
+//				e.getModifiers()// ActionEvent.MOUSE_EVENT_MASK
+				if(e.getModifiers()==16)
+				{
+					manualLockZ = lockZ.isSelected();
+					Base.logger.info("Manually (un)locked. ManLock="+manualLockZ);
+				}
+			}
+		});
 		p.add(lockZ,"growx,wrap");
 		
 		return p;
@@ -61,7 +79,7 @@ public class MoveTool extends Tool implements KeyListener {
 
 	public String getInstructions() {
 		return Base.isMacOS()?
-				"<html><body>Drag to move object<br>Shift-drag to rotate view<br>Mouse wheel to zoom</body></html>":
+				"<html><body>Drag to move object<br>Shift-drag to constrain height<br>Mouse wheel to zoom</body></html>":
 				"<html><body>Left drag to move object<br>Right drag to rotate view<br>Mouse wheel to zoom</body></html>";
 	}
 
@@ -70,14 +88,18 @@ public class MoveTool extends Tool implements KeyListener {
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		if (startPoint == null) return;
-		Point p = e.getPoint();
-		DragMode mode = DragMode.NONE; 
-		if (Base.isMacOS()) {
-			if (button == MouseEvent.BUTTON1 && !e.isShiftDown()) { mode = DragMode.TRANSLATE_OBJECT; }
-		} else {
-			if (button == MouseEvent.BUTTON1) { mode = DragMode.TRANSLATE_OBJECT; }
+		if (startPoint == null) 
+		{
+			return;
 		}
+		Point p = e.getPoint();
+		mode = DragMode.NONE; 
+//		if (Base.isMacOS()) {
+//			if (button == MouseEvent.BUTTON1 && !e.isShiftDown()) { mode = DragMode.TRANSLATE_OBJECT; }
+//		} else {
+//		if (button == MouseEvent.BUTTON2) { mode = DragMode.NONE; }
+			if (button == MouseEvent.BUTTON1) { mode = DragMode.TRANSLATE_OBJECT; }
+//		}
 		double xd = (double)(p.x - startPoint.x);
 		double yd = -(double)(p.y - startPoint.y);
 		switch (mode) {
@@ -90,51 +112,68 @@ public class MoveTool extends Tool implements KeyListener {
 		}
 		startPoint = p;
 	}
-		
+
+	
 	public void mousePressed(MouseEvent e) {
+		Point3d bottom = parent.getModel().getBottom();
+		Base.logger.info("drag start = "+bottom.z);
+		dragStartBottom = bottom.z;
+
 		// Set up view transform
+		if(e.isShiftDown()){
+			Base.logger.info("Locked z. ManualLock="+manualLockZ);
+			lockZ.setSelected(true);
+			zWasLocked = true;
+		} else {
+			if(manualLockZ==false)
+			{
+				lockZ.setSelected(false);
+				zWasLocked = false;
+			}
+		}
 		vt = parent.preview.getViewTransform();
 		super.mousePressed(e);
 	}
 	
-	/** Handle the key-pressed event */
-    public void keyPressed(KeyEvent e) {
-    	if(e.isShiftDown())
-    		lockZ.setSelected(true);
-    }
-	public void keyReleased(KeyEvent e) {
-    	//displayInfo(e, "KEY PRESSED: ");
-    	int modifiersEx = e.getModifiersEx();
-    	String tmpString = KeyEvent.getModifiersExText(modifiersEx);
-    	Base.logger.info("releasing: "+tmpString+" key="+e.getModifiersEx());
-//		if(KeyEvent.getModifiersExText(modifiersEx)=="shift")
-//		{
-//			Base.logger.info("Pressing: "+KeyEvent.getModifiersExText(modifiersEx)+" key="+e.getModifiersEx());
-    	switch(e.getKeyChar())
-    	{
-    		case('c'):
-    			Base.logger.info("Center...");
-			break;
-    		
-    		default:
-    	
-        	if(!e.isShiftDown())
-        		lockZ.setSelected(false);
-    	}
-//		}
-	}
-
-	public void keyTyped(KeyEvent e) {
-		// TODO on pressing c, center the object
-	}
-
 	void doTranslate(double deltaX, double deltaY) {
 		Vector3d v = new Vector3d(deltaX,deltaY,0d);
 		vt.transform(v);
-		if (lockZ.isSelected()) { v.z = 0d; }
+		if (lockZ.isSelected()) { 
+		//	v.z = 0d; 
+			Point3d bottom = parent.getModel().getBottom();
+			v.z = dragStartBottom - bottom.z; 
+//			Base.logger.info("Drag start bottom = "+dragStartBottom);
+		}
 		parent.getModel().translateObject(v.x,v.y,v.z);
 	}
 
+	@Override
+	public void keyTyped(KeyEvent e) {
+	}
 
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.isShiftDown())
+		{
+			Base.logger.info("Shift first pressed. Should not orbit. ManualLock="+manualLockZ);
+			lockZ.setSelected(true);
+			
+			zWasLocked = true;
+		} else {
+			if(manualLockZ==false)
+				zWasLocked = lockZ.isSelected();
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if(!e.isShiftDown())
+		{
+			Base.logger.info("Shift released. ManualLock="+manualLockZ);
+			if(manualLockZ==false)
+				lockZ.setSelected(false);
+		}
+		
+	}
 
 }

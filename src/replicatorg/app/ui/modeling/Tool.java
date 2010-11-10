@@ -24,6 +24,7 @@ import replicatorg.app.Base;
 import replicatorg.app.ui.modeling.PreviewPanel.DragMode;
 
 public abstract class Tool implements MouseMotionListener, MouseListener, MouseWheelListener {
+	DragMode mode;
 	public class AxisControl {
 		SpinnerNumberModel model;
 		JSpinner spinner;
@@ -85,7 +86,7 @@ public abstract class Tool implements MouseMotionListener, MouseListener, MouseW
 	public void mouseDragged(MouseEvent e) {
 		if (startPoint == null) return;
 		Point p = e.getPoint();
-		DragMode mode = DragMode.ROTATE_VIEW; 
+		mode = DragMode.ROTATE_VIEW; 
 		if (Base.isMacOS()) {
 			if (button == MouseEvent.BUTTON1 && !e.isShiftDown()) { mode = DragMode.ROTATE_VIEW; }
 			else if (button == MouseEvent.BUTTON1 && e.isShiftDown()) { mode = DragMode.ROTATE_VIEW; }
