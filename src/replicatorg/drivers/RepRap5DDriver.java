@@ -21,8 +21,8 @@
  Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 /* TODOs:
- * (M6 T0 (Wait for tool to heat up)) - not supported? Rewrite to other code?
- * 
+ * (M6 T0 (Wait for tool to heat up)) - not supported? Rewrite to M109 code?
+ * USE acceleration http://www.reprap.org/wiki/Generation2Firmware#The_Five_dimensional_GCode_Inter
  * 
  */
 package replicatorg.drivers;
