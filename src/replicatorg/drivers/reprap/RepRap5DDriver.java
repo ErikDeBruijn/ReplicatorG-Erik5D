@@ -357,7 +357,7 @@ public class RepRap5DDriver extends SerialDriver {
 
 						}
 						// old arduino firmware sends "start"
-						else if (line.startsWith("start")) {
+						else if (line.toLowerCase().startsWith("start")) {
 							// todo: set version
 							// TODO: check if this was supposed to happen, otherwise report unexpected reset! 
 							setInitialized(true);
