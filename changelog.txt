@@ -4,6 +4,7 @@ Contributions:
 * nazdravi: check for "python2" for compatibility on systems which default to python 3.x
 * Erik: added 5D driver for RepRap's and compatible firmwares (Ultimaker)
 * Erik: STL preview now is the actual build volumes configured in machines.xml
+* Erik: Pre-seeds the extruder PWM and RPM as configured in machines.xml
 
 0021 ReplicatorG
 Bugfix release
