@@ -462,13 +462,9 @@ public class ExtruderPanel extends JPanel implements FocusListener, ActionListen
 		try {
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				if (name.equals("motor-forward")) {
-					driver.setMotorRPM(Double.parseDouble(source.getText()));
-					driver.setMotorSpeedPWM(Integer.parseInt(source.getText()));
 					driver.setMotorDirection(ToolModel.MOTOR_CLOCKWISE);
 					driver.enableMotor();
 				} else if (name.equals("motor-reverse")) {
-					driver.setMotorRPM(Double.parseDouble(source.getText()));
-					driver.setMotorSpeedPWM(Integer.parseInt(source.getText()));
 					driver.setMotorDirection(ToolModel.MOTOR_COUNTER_CLOCKWISE);
 					driver.enableMotor();
 				} else if (name.equals("motor-stop"))
