@@ -1,3 +1,23 @@
+======================================================================================================================
+
+NO FURTHER DEVELOPMENT OF THE ULTIMAKER/REPRAP FORK IS DONE HERE. 
+SEE https://github.com/Ultimaker/ReplicatorG for further development!
+THESE CHANGE ARE INTEGRATED UPSTREAM IN makerbot/ReplicatorG
+
+Erik
+======================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
 ReplicatorG is an open-source GCode based controller for RepRap / CNC machines.  It has 3 main goals:
 
 1. Be as simple to use, and as easy to install as possible.
